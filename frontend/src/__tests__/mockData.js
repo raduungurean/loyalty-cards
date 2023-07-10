@@ -28,6 +28,46 @@ export const mockSuccessResponse = { status: 200, json: {
     }
   } };
 
+export const mockCard = {
+  id: 41,
+  uid: 29,
+  title: "asdasd",
+  color: "#6e1919",
+  barcode: "434444343",
+  icon: "",
+  description: "asdasdasdasd",
+  created_at: {
+    date: "2023-07-10 15:01:54.000000",
+    timezone_type: 3,
+    timezone: "Europe\/Berlin"
+  },
+  updated_at: {
+    date: "2023-07-10 15:01:54.000000",
+    timezone_type: 3,
+    timezone: "Europe\/Berlin"
+  }
+};
+
+export const mockCard2 = {
+  id: 42,
+  uid: 29,
+  title: "42 asdasd",
+  color: "#6e1919",
+  barcode: "434444343",
+  icon: "",
+  description: "asdasdasdasd",
+  created_at: {
+    date: "2023-07-10 15:01:54.000000",
+    timezone_type: 3,
+    timezone: "Europe\/Berlin"
+  },
+  updated_at: {
+    date: "2023-07-10 15:01:54.000000",
+    timezone_type: 3,
+    timezone: "Europe\/Berlin"
+  }
+};
+
 export const mockErrorResponse = { status: 404 };
 
 export const mockCardsSuccessResponse = {

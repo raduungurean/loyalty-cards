@@ -1,4 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
+import { successAddCardMessageText, successDeleteCardMessageText } from '../../constants';
 
 const cardsSlice = createSlice({
     name: 'cards',
@@ -27,14 +28,14 @@ const cardsSlice = createSlice({
             state.progress = false;
             state.progressDelete[action.payload] = false;
             state.list = state.list.filter(card => card.id !== action.payload);
-            state.success = 'The card has been successfully deleted.'
+            state.success = successDeleteCardMessageText
         },
         cardAddRequest: (state, action) => {
             state.progress = true;
         },
         cardAddSuccess: (state, action) => {
             state.progress = false;
-            state.success = 'The card has been successfully added.'
+            state.success = successAddCardMessageText
             state.list = state.list.concat([action.payload])
         },
         cardEditRequest: (state, action) => {

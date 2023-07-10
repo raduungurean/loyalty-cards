@@ -4,6 +4,7 @@ import registerReducer from './reducers/registerSlice';
 import forgotPasswordReducer from './reducers/forgotPasswordSlice';
 import cardsReducer from './reducers/cardsSlice';
 import newPassword from './reducers/newPasswordSlice';
+import { configureStore } from '@reduxjs/toolkit';
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -13,4 +14,11 @@ const rootReducer = combineReducers({
     cards: cardsReducer,
 });
 
+export const setupStore = preloadedState => {
+    return configureStore({
+        reducer: rootReducer,
+        middleware: (m) => m(),
+        preloadedState
+    })
+}
 export default rootReducer;

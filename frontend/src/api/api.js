@@ -1,5 +1,5 @@
 import axios from "./axiosInstance";
-import { dataURLtoBlob, generateRandomString } from '../utils';
+import { dataURLtoBlob, generateRandomString } from '../utils/utils';
 
 export const authenticate = async (username, password) => {
     const response = await axios.post(`/login`, { username, password });

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import { ClipLoader } from 'react-spinners';
-import { getTextColor } from '../utils';
+import { getTextColor } from '../utils/utils';
 import { BASE_URL } from '../constants';
 
 const Card = ({ card, onEdit, onDelete, loading }) => {

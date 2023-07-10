@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { localStorageWrapper, sessionStorageWrapper } from '../../utils/storage';
 
 const initialState = {
     user: null,
-    token: localStorage.getItem('token'),
+    token: localStorageWrapper.getItem('token'),
     isLoggedIn: false,
     isLoggingIn: false,
     isLoggingOut: false,
@@ -28,9 +29,9 @@ const authSlice = createSlice({
             state.token = action.payload.token;
             state.error = null;
             if (state.remember) {
-                localStorage.setItem("token", action.payload.token);
+                localStorageWrapper.setItem('token', action.payload.token);
             } else {
-                sessionStorage.setItem("token", action.payload.token);
+                sessionStorageWrapper.setItem('token', action.payload.token);
             }
         },
         loginFailure(state, action) {
@@ -39,8 +40,8 @@ const authSlice = createSlice({
             state.isLoggedIn = false;
             state.user = null;
             state.token = null;
-            localStorage.removeItem('token');
-            sessionStorage.removeItem('token');
+            localStorageWrapper.removeItem('token');
+            sessionStorageWrapper.removeItem('token');
         },
         logoutRequest(state) {
             state.isLoggingOut = true;
@@ -51,8 +52,8 @@ const authSlice = createSlice({
             state.user = null;
             state.token = null;
             state.error = null;
-            localStorage.removeItem('token');
-            sessionStorage.removeItem('token');
+            localStorageWrapper.removeItem('token');
+            sessionStorageWrapper.removeItem('token');
         },
         logoutFailure(state) {
             state.isLoggingOut = false;

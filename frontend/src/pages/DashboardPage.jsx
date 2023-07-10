@@ -14,6 +14,28 @@ import { clearError, clearSuccess } from '../store/reducers/cardsSlice';
 import AddCardDialog from '../components/AddCardDialog';
 import EditCardDialog from '../components/EditCardDialog';
 import * as api from '../api/api';
+import * as PropTypes from 'prop-types';
+
+function CardListComponent({
+  cards,
+  isLoadingEdit,
+  openEditModal,
+  handleOpenDialog,
+}) {
+  return (
+    <>
+      {cards.map((card, index) => (
+        <Card
+          key={index}
+          card={card}
+          loading={card.id === isLoadingEdit}
+          onEdit={openEditModal}
+          onDelete={handleOpenDialog}
+        />
+      ))}
+    </>
+  );
+}
 
 const DashboardPage = () => {
   const [title, setTitle] = useState('');
@@ -176,15 +198,12 @@ const DashboardPage = () => {
   return (
     <>
       <div className="flex flex-wrap">
-        {cards.map((card, index) => (
-          <Card
-            key={index}
-            card={card}
-            loading={card.id === isLoadingEdit}
-            onEdit={openEditModal}
-            onDelete={handleOpenDialog}
-          />
-        ))}
+        <CardListComponent
+          cards={cards}
+          isLoadingEdit={isLoadingEdit}
+          openEditModal={openEditModal}
+          handleOpenDialog={handleOpenDialog}
+        />
         <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 p-4 flex">
           <button
             onClick={openAddCardModal}

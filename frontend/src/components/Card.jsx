@@ -52,7 +52,10 @@ const Card = ({ card, onEdit, onDelete, loading }) => {
   };
 
   return (
-    <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 p-4 flex">
+    <div
+      className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 p-4 flex"
+      data-testid="fidelity-card"
+    >
       <div
         className={`rounded-lg shadow-lg p-6 flex flex-col justify-between h-full w-full ${
           isHovered

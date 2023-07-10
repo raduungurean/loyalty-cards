@@ -14,28 +14,7 @@ import { clearError, clearSuccess } from '../store/reducers/cardsSlice';
 import AddCardDialog from '../components/AddCardDialog';
 import EditCardDialog from '../components/EditCardDialog';
 import * as api from '../api/api';
-import * as PropTypes from 'prop-types';
-
-function CardListComponent({
-  cards,
-  isLoadingEdit,
-  openEditModal,
-  handleOpenDialog,
-}) {
-  return (
-    <>
-      {cards.map((card, index) => (
-        <Card
-          key={index}
-          card={card}
-          loading={card.id === isLoadingEdit}
-          onEdit={openEditModal}
-          onDelete={handleOpenDialog}
-        />
-      ))}
-    </>
-  );
-}
+import CardsListComponent from '../components/CardsListComponent';
 
 const DashboardPage = () => {
   const [title, setTitle] = useState('');
@@ -53,8 +32,12 @@ const DashboardPage = () => {
   const [isLoadingEdit, setIsLoadingEdit] = useState(0);
 
   const [cardId, setCardId] = useState(null);
-  const cards = useSelector((state) => state.cards.list);
-  const loading = useSelector((state) => state.cards.loading);
+  const cards = useSelector((state) => {
+    return state.cards.list;
+  });
+  const loading = useSelector((state) => {
+    return state.cards.loading;
+  });
   const cardsErrorText = useSelector((state) => state.cards.error);
   const cardsSuccessText = useSelector((state) => state.cards.success);
   const progress = useSelector((state) => state.cards.progress);
@@ -198,7 +181,7 @@ const DashboardPage = () => {
   return (
     <>
       <div className="flex flex-wrap">
-        <CardListComponent
+        <CardsListComponent
           cards={cards}
           isLoadingEdit={isLoadingEdit}
           openEditModal={openEditModal}

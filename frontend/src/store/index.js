@@ -15,10 +15,13 @@ const rootReducer = combineReducers({
 });
 
 export const setupStore = preloadedState => {
+    if (preloadedState && preloadedState.cards) {
+        console.log('*************************', preloadedState);
+    }
     return configureStore({
         reducer: rootReducer,
         middleware: (m) => m(),
-        preloadedState
+        preloadedState: preloadedState
     })
 }
 export default rootReducer;

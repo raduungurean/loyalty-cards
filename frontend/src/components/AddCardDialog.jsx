@@ -58,7 +58,7 @@ const AddCardDialog = ({
           );
           setHasCamera(hasVideoInput);
         } catch (error) {
-          console.error('Error checking camera availability:', error);
+          // console.error('Error checking camera availability:', error);
         }
       };
 

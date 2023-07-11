@@ -43,13 +43,13 @@ class CardBuilder
         return $this;
     }
 
-    public function createdAt(string $createdAt): self
+    public function createdAt(DateTime $createdAt): self
     {
         $this->data['created_at'] = $createdAt;
         return $this;
     }
 
-    public function updatedAt(string $updatedAt): self
+    public function updatedAt(DateTime $updatedAt): self
     {
         $this->data['updated_at'] = $updatedAt;
         return $this;

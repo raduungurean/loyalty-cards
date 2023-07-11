@@ -54,6 +54,21 @@ class Card implements JsonSerializable
         return $this->id;
     }
 
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function getBarcode(): string
+    {
+        return $this->barcode;
+    }
+
     #[\ReturnTypeWillChange]
     public function jsonSerialize(): array
     {

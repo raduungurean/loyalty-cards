@@ -58,7 +58,7 @@ return function (ContainerBuilder $containerBuilder) {
                 throw new RuntimeException("Failed to connect to database: " . $e->getMessage());
             }
         },
-        'jwtAuthMiddleware' => function (ContainerInterface $container) {
+        JwtAuthMiddleware::class => function (ContainerInterface $container) {
             $settings = $container->get(SettingsInterface::class);
             $jwtSettings = $settings->get('jwt');
             return new JwtAuthMiddleware(
@@ -66,8 +66,8 @@ return function (ContainerBuilder $containerBuilder) {
                 $jwtSettings['algorithm']
             );
         },
-        JwtServiceInterface::class => function ($c) {
-            $settings = $c->get(SettingsInterface::class);
+        JwtServiceInterface::class => function (ContainerInterface $container) {
+            $settings = $container->get(SettingsInterface::class);
             $jwtSettings = $settings->get('jwt');
             return new JwtService($jwtSettings['secret'], $jwtSettings['algorithm']);
         },

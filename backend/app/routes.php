@@ -16,6 +16,7 @@ use App\Application\Actions\User\LogoutAction;
 use App\Application\Actions\User\NewPasswordAction;
 use App\Application\Actions\User\ReauthenticateAction;
 use App\Application\Actions\User\RegisterAction;
+use App\Application\Middleware\JwtAuthMiddleware;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -52,7 +53,7 @@ return function (App $app) {
             $groupCards->get('', ListCardsAction::class);
             $groupCards->get('/{id}', ViewCardAction::class);
             $groupCards->delete('/{id}', DeleteCardAction::class);
-        })->add($app->getContainer()->get('jwtAuthMiddleware'));
+        })->add($app->getContainer()->get(JwtAuthMiddleware::class));
 
         $group->get('/icon/{icon}', GetIconAction::class);
     });

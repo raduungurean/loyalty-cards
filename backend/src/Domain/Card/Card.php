@@ -18,7 +18,9 @@ class Card implements JsonSerializable
     private $created_at;
     private $updated_at;
 
-    public function __construct(
+    private function __construct() {}
+
+    public static function create(
         ?int $id,
         string $title,
         ?string $color,
@@ -28,16 +30,23 @@ class Card implements JsonSerializable
         $barcode,
         $icon,
         ?int $uid
-    ) {
-        $this->id = $id;
-        $this->title = $title;
-        $this->color = $color;
-        $this->description = $description;
-        $this->created_at = $created_at;
-        $this->updated_at = $updated_at;
-        $this->uid = $uid;
-        $this->barcode = $barcode;
-        $this->icon = $icon;
+    ): self {
+        $card = new self();
+        $card->id = $id;
+        $card->title = $title;
+        $card->color = $color;
+        $card->description = $description;
+        $card->created_at = $created_at;
+        $card->updated_at = $updated_at;
+        $card->uid = $uid;
+        $card->barcode = $barcode;
+        $card->icon = $icon;
+        return $card;
+    }
+
+    public static function builder(): CardBuilder
+    {
+        return new CardBuilder();
     }
 
     public function getId(): ?int

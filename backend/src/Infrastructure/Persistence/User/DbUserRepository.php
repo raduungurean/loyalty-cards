@@ -23,9 +23,9 @@ class DbUserRepository implements UserRepository
         $stmt = $this->pdo->query('SELECT * FROM users');
         $users = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $users[] = new User(
-                $row
-            );
+            $users[] = User::builder()
+                ->fromRow($row)
+                ->build();
         }
         return $users;
     }
@@ -34,13 +34,14 @@ class DbUserRepository implements UserRepository
     {
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE id = :id');
         $stmt->execute([':id' => $id]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$user) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
             throw new UserNotFoundException("User with id $id not found");
         }
-        return new User(
-            $user
-        );
+
+        return User::builder()
+            ->fromRow($row)
+            ->build();
     }
 
     /**
@@ -50,13 +51,14 @@ class DbUserRepository implements UserRepository
     {
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = :email');
         $stmt->execute([':email' => $email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$user) {
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
             throw new UserNotFoundException("User with id $email not found");
         }
-        return new User(
-            $user
-        );
+
+        return User::builder()
+            ->fromRow($row)
+            ->build();
     }
 
     /**
@@ -69,15 +71,15 @@ class DbUserRepository implements UserRepository
             ':usernameOrEmail' => $usernameOrEmail,
             ':password' => md5($password),
         ]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) {
+        if (!$row) {
             throw new UserNotFoundException();
         }
 
-        return new User(
-            $user
-        );
+        return User::builder()
+            ->fromRow($row)
+            ->build();
     }
 
     private function findByUsernameOrEmail(string $username, string $email): bool
@@ -104,24 +106,25 @@ class DbUserRepository implements UserRepository
         }
 
         $stmt = $this->pdo->prepare('INSERT INTO users (username, first_name, last_name, email, password, token) VALUES (:username, :firstName, :lastName, :email, :password, :token)');
+        $token = bin2hex(random_bytes(32));
         $stmt->execute([
             ':username' => $userData['username'],
             ':firstName' => $userData['firstName'],
             ':lastName' => $userData['lastName'],
             ':email' => $userData['email'],
             ':password' => md5($userData['password']),
-            ':token' => bin2hex(random_bytes(32)),
+            ':token' => $token,
         ]);
 
         $userId = $this->pdo->lastInsertId();
 
-        $userData['id'] = $userId;
-        $userData['first_name'] = $userData['firstName'];
-        $userData['last_name'] = $userData['lastName'];
-
-        return new User(
-            $userData
-        );
+        return User::builder()
+            ->id($userId)
+            ->firstName($userData['firstName'])
+            ->lastName($userData['lastName'])
+            ->email($userData['email'])
+            ->token($token)
+            ->build();
     }
 
     /**
@@ -138,9 +141,9 @@ class DbUserRepository implements UserRepository
             throw new UserNotFoundException();
         }
 
-        return new User(
-            $row
-        );
+        return User::builder()
+            ->fromRow($row)
+            ->build();
     }
 
     public function activateAccount(int $uid)
@@ -177,9 +180,9 @@ class DbUserRepository implements UserRepository
             throw new UserNotFoundException();
         }
 
-        return new User(
-            $row
-        );
+        return User::builder()
+            ->fromRow($row)
+            ->build();
     }
 
     public function updatePassword(int $id, string $password)

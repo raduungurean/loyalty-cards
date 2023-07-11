@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Tests\Application\Actions\User;
+namespace Tests\Application\Actions\Card;
 
 use App\Application\Actions\ActionError;
 use App\Application\Actions\ActionPayload;
 use App\Application\Handlers\HttpErrorHandler;
-use App\Domain\User\User;
-use App\Domain\User\UserNotFoundException;
-use App\Domain\User\CardRepository;
+use App\Domain\Card\Card;
+use App\Domain\Card\CardNotFoundException;
+use App\Domain\Card\CardRepository;
 use DI\Container;
 use Slim\Middleware\ErrorMiddleware;
-use Tests\TestCase;
+use Tests\CardsTestCase;
 
-class ViewUserActionTest extends TestCase
+class ViewCardActionTest extends CardsTestCase
 {
     public function testAction()
     {
@@ -23,27 +23,34 @@ class ViewUserActionTest extends TestCase
         /** @var Container $container */
         $container = $app->getContainer();
 
-        $user = new User(1, 'bill.gates', 'Bill', 'Gates');
+        $card = Card::builder()
+            ->id(1)
+            ->title('catena')
+            ->description('catena card')
+            ->build();
 
-        $userRepositoryProphecy = $this->prophesize(CardRepository::class);
-        $userRepositoryProphecy
-            ->findUserOfId(1)
-            ->willReturn($user)
+        $cardRepositoryProphecy = $this->prophesize(CardRepository::class);
+        $cardRepositoryProphecy
+            ->findCardOfId(1)
+            ->willReturn($card)
             ->shouldBeCalledOnce();
 
-        $container->set(CardRepository::class, $userRepositoryProphecy->reveal());
+        $container->set(CardRepository::class, $cardRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users/1');
+        $request = $this->createRequest('GET', '/api/cards/1', [
+            'HTTP_ACCEPT' => 'application/json',
+            'Authorization' => 'Bearer ' . $this->generateJwtToken(),
+        ]);
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();
-        $expectedPayload = new ActionPayload(200, $user);
+        $expectedPayload = new ActionPayload(200, $card);
         $serializedPayload = json_encode($expectedPayload, JSON_PRETTY_PRINT);
 
         $this->assertEquals($serializedPayload, $payload);
     }
 
-    public function testActionThrowsUserNotFoundException()
+    public function testActionThrowsCardNotFoundException()
     {
         $app = $this->getAppInstance();
 
@@ -59,19 +66,22 @@ class ViewUserActionTest extends TestCase
         /** @var Container $container */
         $container = $app->getContainer();
 
-        $userRepositoryProphecy = $this->prophesize(CardRepository::class);
-        $userRepositoryProphecy
-            ->findUserOfId(1)
-            ->willThrow(new UserNotFoundException())
+        $cardRepositoryProphecy = $this->prophesize(CardRepository::class);
+        $cardRepositoryProphecy
+            ->findCardOfId(1)
+            ->willThrow(new CardNotFoundException())
             ->shouldBeCalledOnce();
 
-        $container->set(CardRepository::class, $userRepositoryProphecy->reveal());
+        $container->set(CardRepository::class, $cardRepositoryProphecy->reveal());
 
-        $request = $this->createRequest('GET', '/users/1');
+        $request = $this->createRequest('GET', '/api/cards/1', [
+            'HTTP_ACCEPT' => 'application/json',
+            'Authorization' => 'Bearer ' . $this->generateJwtToken(),
+        ]);
         $response = $app->handle($request);
 
         $payload = (string) $response->getBody();
-        $expectedError = new ActionError(ActionError::RESOURCE_NOT_FOUND, 'The user you requested does not exist.');
+        $expectedError = new ActionError(ActionError::RESOURCE_NOT_FOUND, 'The card you requested does not exist.');
         $expectedPayload = new ActionPayload(404, null, $expectedError);
         $serializedPayload = json_encode($expectedPayload, JSON_PRETTY_PRINT);
 

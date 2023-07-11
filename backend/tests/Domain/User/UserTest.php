@@ -12,7 +12,7 @@ class UserTest extends TestCase
     public function userProvider(): array
     {
         return [
-            [1, 'bill.gates', 'Bill', 'Gates'],
+            [1, 'elon.musk', 'Elon', 'Musk'],
             [2, 'steve.jobs', 'Steve', 'Jobs'],
             [3, 'mark.zuckerberg', 'Mark', 'Zuckerberg'],
             [4, 'evan.spiegel', 'Evan', 'Spiegel'],
@@ -29,7 +29,12 @@ class UserTest extends TestCase
      */
     public function testGetters(int $id, string $username, string $firstName, string $lastName)
     {
-        $user = new User($id, $username, $firstName, $lastName);
+        $user = User::builder()
+            ->id($id)
+            ->username($username)
+            ->firstName($firstName)
+            ->lastName($lastName)
+            ->build();
 
         $this->assertEquals($id, $user->getId());
         $this->assertEquals($username, $user->getUsername());
@@ -46,13 +51,24 @@ class UserTest extends TestCase
      */
     public function testJsonSerialize(int $id, string $username, string $firstName, string $lastName)
     {
-        $user = new User($id, $username, $firstName, $lastName);
+        $user = User::builder()
+            ->id($id)
+            ->username($username)
+            ->firstName($firstName)
+            ->lastName($lastName)
+            ->email('')
+            ->token(null)
+            ->forgetToken(null)
+            ->build();
 
         $expectedPayload = json_encode([
             'id' => $id,
             'username' => $username,
             'firstName' => $firstName,
             'lastName' => $lastName,
+            'email' => '',
+            'token' => null,
+            'forgetToken' => null,
         ]);
 
         $this->assertEquals($expectedPayload, json_encode($user));

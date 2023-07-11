@@ -1,5 +1,6 @@
 <?php
 
+
 declare(strict_types=1);
 
 namespace App\Domain\User;
@@ -16,14 +17,31 @@ class User implements JsonSerializable
     private ?string $token;
     private ?string $forgetToken;
 
-    public function __construct(array $userData) {
-        $this->id = $userData['id'] ? intval($userData['id']) :  null;
-        $this->username = strtolower($userData['username']);
-        $this->firstName = ucfirst($userData['first_name']);
-        $this->lastName = ucfirst($userData['last_name']);
-        $this->email = $userData['email'];
-        $this->token = $userData['token'] ?? null;
-        $this->forgetToken = $userData['forgot_token'] ?? null;
+    private function __construct() {}
+
+    public static function create(
+        ?int $id,
+        string $username,
+        string $firstName,
+        string $lastName,
+        string $email,
+        ?string $token = null,
+        ?string $forgetToken = null
+    ): self {
+        $user = new self();
+        $user->id = $id;
+        $user->username = $username;
+        $user->firstName = $firstName;
+        $user->lastName = $lastName;
+        $user->email = $email;
+        $user->token = $token;
+        $user->forgetToken = $forgetToken;
+        return $user;
+    }
+
+    public static function builder(): UserBuilder
+    {
+        return new UserBuilder();
     }
 
     public function getId(): ?int
@@ -81,7 +99,7 @@ class User implements JsonSerializable
         $this->token = $token;
     }
 
-    public function getForgetToken()
+    public function getForgetToken(): ?string
     {
         return $this->forgetToken;
     }
@@ -89,5 +107,45 @@ class User implements JsonSerializable
     public function setForgetToken(string $token): void
     {
         $this->forgetToken = $token;
+    }
+
+    /**
+     * @param int|null $id
+     */
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @param string $username
+     */
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * @param string $firstName
+     */
+    public function setFirstName(string $firstName): void
+    {
+        $this->firstName = $firstName;
+    }
+
+    /**
+     * @param string $lastName
+     */
+    public function setLastName(string $lastName): void
+    {
+        $this->lastName = $lastName;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
     }
 }

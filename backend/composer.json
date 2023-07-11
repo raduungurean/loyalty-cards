@@ -22,7 +22,6 @@
         }
     ],
     "require": {
-        "php": "^7.4",
         "ext-json": "*",
         "ext-pdo": "*",
         "fakerphp/faker": "^1.21",
@@ -67,7 +66,7 @@
         }
     },
     "scripts": {
-        "start": "php -S localhost:8080 -t public",
+        "start": "php -S localhost:8081 -t public",
         "test": "phpunit",
         "phinx-migrate": "vendor/bin/phinx migrate -c app/phinx.php"
     }

@@ -1,4 +1,4 @@
-FROM php:7.4-apache
+FROM php:8.1-apache
 
 RUN a2enmod rewrite
 
@@ -14,7 +14,9 @@ WORKDIR /var/www/html
 
 COPY --chown=www-data:www-data . .
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && curl -L https://phar.phpunit.de/phpunit.phar -o /usr/local/bin/phpunit \
+    && chmod +x /usr/local/bin/phpunit
 
 RUN printf "\
     <VirtualHost *:80>\n\

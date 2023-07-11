@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Persistence\Card;
 
 use App\Domain\Card\Card;
+use App\Domain\Card\CardNotFoundException;
 use App\Domain\Card\CardRepository;
 use App\Domain\DomainException\DomainRecordNotFoundException;
 use DateTime;
@@ -26,17 +27,9 @@ class DbCardRepository implements CardRepository
         $cards = [];
 
         foreach ($data as $row) {
-            $card = new Card(
-                $row['id'],
-                $row['title'],
-                $row['color'],
-                $row['description'],
-                new DateTime($row['created_at']),
-                new DateTime($row['updated_at']),
-                $row['barcode'],
-                $row['icon_path'],
-                $row['uid'],
-            );
+            $card = Card::builder()
+                ->fromRow($row)
+                ->build();
             $cards[] = $card;
         }
 
@@ -52,23 +45,18 @@ class DbCardRepository implements CardRepository
         $cards = [];
 
         foreach ($data as $row) {
-            $card = new Card(
-                $row['id'],
-                $row['title'],
-                $row['color'],
-                $row['description'],
-                new DateTime($row['created_at']),
-                new DateTime($row['updated_at']),
-                $row['barcode'],
-                $row['icon_path'],
-                $row['uid'],
-            );
+            $card = Card::builder()
+                ->fromRow($row)
+                ->build();
             $cards[] = $card;
         }
 
         return $cards;
     }
 
+    /**
+     * @throws CardNotFoundException
+     */
     public function findCardOfId(int $id): Card
     {
         $stmt = $this->db->prepare('SELECT * FROM cards WHERE id = :id');
@@ -76,20 +64,12 @@ class DbCardRepository implements CardRepository
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$row) {
-            throw new Exception('Card not found');
+            throw new CardNotFoundException("Card with id $id not found");
         }
 
-        $card = new Card(
-            $row['id'],
-            $row['title'],
-            $row['color'],
-            $row['description'],
-            new DateTime($row['created_at']),
-            new DateTime($row['updated_at']),
-            $row['barcode'],
-            $row['icon_path'],
-            $row['uid'],
-        );
+        $card = Card::builder()
+            ->fromRow($row)
+            ->build();
 
         return $card;
     }

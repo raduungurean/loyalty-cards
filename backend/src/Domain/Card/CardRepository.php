@@ -18,4 +18,5 @@ interface CardRepository
     public function deleteCardById(int $cardId);
     public function addCard($data, int $uid);
     public function editCard(object $data, int $uid): bool;
+    public function setIconForCard(int $cardId, int $uid, string $iconPath): bool;
 }

@@ -2,42 +2,42 @@
 
 namespace App\Application\Actions\Card;
 
-use App\Application\Settings\SettingsInterface;
 use App\Domain\Card\CardRepository;
+use App\Domain\Event\CardWasAdded;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Log\LoggerInterface;
-use Slim\Psr7\UploadedFile;
 
 class AddCardAction extends CardsAction
 {
-    protected ContainerInterface $c;
+    protected ContainerInterface $container;
+    private EventDispatcherInterface $dispatcher;
 
-    public function __construct(LoggerInterface $logger, CardRepository $cardRepository, ContainerInterface $c)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        CardRepository $cardRepository,
+        ContainerInterface $c,
+        EventDispatcherInterface $dispatcher
+    ) {
         parent::__construct($logger, $cardRepository);
-        $this->c = $c;
+        $this->container = $c;
+        $this->dispatcher = $dispatcher;
     }
 
     protected function action(): Response
     {
         $data = $this->getFormData();
         $uid = $this->request->getAttribute('uid');
-
-        $avatarPath = '';
         $uploadedAvatar = $this->request->getUploadedFiles()['avatar'] ?? null;
-        if ($uploadedAvatar instanceof UploadedFile && $uploadedAvatar->getError() === UPLOAD_ERR_OK) {
-            $filename = uniqid('image-', true) . '.' . pathinfo($uploadedAvatar->getClientFilename(), PATHINFO_EXTENSION);
-            $settings = $this->c->get(SettingsInterface::class);
-            $iconsPath = $settings->get('upload_path');
-            $avatarPath = $iconsPath . DIRECTORY_SEPARATOR . $filename;
-            $uploadedAvatar->moveTo($avatarPath);
-            $data['icon_path'] = $filename;
-        }
 
         $lastInsertId = $this->cardRepository->addCard($data, $uid);
+
+        $event = new CardWasAdded($lastInsertId, $uid, $uploadedAvatar);
+        $this->dispatcher->dispatch($event);
+
         $card = $this->cardRepository->findCardOfId($lastInsertId);
 
-        return $this->respondWithData(['card' => $card, 'ap' => $avatarPath]);
+        return $this->respondWithData(['card' => $card]);
     }
 }

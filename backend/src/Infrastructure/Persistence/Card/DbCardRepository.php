@@ -5,12 +5,8 @@ namespace App\Infrastructure\Persistence\Card;
 use App\Domain\Card\Card;
 use App\Domain\Card\CardNotFoundException;
 use App\Domain\Card\CardRepository;
-use App\Domain\DomainException\DomainRecordNotFoundException;
-use DateTime;
-use Exception;
 use PDO;
 
-// TODO, to throw domain exceptions
 class DbCardRepository implements CardRepository
 {
     private PDO $db;
@@ -67,11 +63,9 @@ class DbCardRepository implements CardRepository
             throw new CardNotFoundException("Card with id $id not found");
         }
 
-        $card = Card::builder()
+        return Card::builder()
             ->fromRow($row)
             ->build();
-
-        return $card;
     }
 
     public function deleteCardById(int $cardId)
@@ -107,7 +101,18 @@ class DbCardRepository implements CardRepository
             'color' => $data['color'],
             'description' => $data['description'],
             'cardId' => $data['id'],
-            'icon_path' => $data['icon_path'],
+            'icon_path' => $data['icon_path'] ?? '',
+            'uid' => $uid,
+        ]);
+        return $stmt->rowCount() > 0;
+    }
+
+    public function setIconForCard(int $cardId, int $uid, string $iconPath): bool
+    {
+        $stmt = $this->db->prepare('UPDATE cards SET icon_path = :icon_path WHERE id = :cardId AND uid = :uid');
+        $stmt->execute([
+            'cardId' => $cardId,
+            'icon_path' => $iconPath,
             'uid' => $uid,
         ]);
         return $stmt->rowCount() > 0;

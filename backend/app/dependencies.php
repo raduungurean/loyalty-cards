@@ -3,13 +3,16 @@
 declare(strict_types=1);
 
 use App\Application\Listeners\AccountActivatedEmailListener;
+use App\Application\Listeners\CardAddListener;
 use App\Application\Listeners\ForgotPasswordEmailListener;
 use App\Application\Listeners\NewPasswordEmailListener;
 use App\Application\Middleware\JwtAuthMiddleware;
 use App\Application\Services\JwtService;
 use App\Application\Services\JwtServiceInterface;
 use App\Application\Settings\SettingsInterface;
+use App\Domain\Card\CardRepository;
 use App\Domain\Event\AccountRegistered;
+use App\Domain\Event\CardWasAdded;
 use App\Domain\Event\NewPasswordCreated;
 use App\Domain\Event\NewPasswordRequested;
 use App\Domain\User\UserRepository;
@@ -86,7 +89,11 @@ return function (ContainerBuilder $containerBuilder) {
             $fromName = $mailerSettings['from_name'];
             $from = "$fromName <$fromAddress>";
             $userRepository = $container->get(UserRepository::class);
+            $cardRepository = $container->get(CardRepository::class);
             $mailer = $container->get('mailer');
+            $settings = $container->get(SettingsInterface::class);
+            $iconsPath = $settings->get('upload_path');
+
             $dispatcher = new EventDispatcher();
             $dispatcher->subscribeTo(
                 AccountRegistered::class, new AccountActivatedEmailListener($appDomain, new Mailer($mailer, $domain, $from), $userRepository),
@@ -96,6 +103,10 @@ return function (ContainerBuilder $containerBuilder) {
             );
             $dispatcher->subscribeTo(
                 NewPasswordCreated::class, new NewPasswordEmailListener($appDomain, new Mailer($mailer, $domain, $from), $userRepository),
+            );
+            $logger = $container->get(LoggerInterface::class);
+            $dispatcher->subscribeTo(
+                CardWasAdded::class, new CardAddListener($cardRepository, $iconsPath, $logger),
             );
             return $dispatcher;
         },
